@@ -2,3 +2,5 @@ numpy==1.23.5
 openpyxl==3.1.2
 pandas==2.2.1
 scikit-learn==1.4.1.post1
+streamlit==1.32.2
+k_means_constrained==0.7.3
