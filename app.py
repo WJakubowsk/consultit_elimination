@@ -4,6 +4,7 @@ from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, OrdinalEncoder, KBinsDiscretizer
 from k_means_constrained import KMeansConstrained
+import time
 
 # function that loads data
 @st.cache_data
@@ -69,19 +70,39 @@ def assign_groups(decompressed_data):
 # main function used to run the streamlit app demo
 def main():
     st.title('Witaj w szkole językowej LinguaViva! :flag-es: :flag-fr: :flag-de: :flag-ru:')
+    st.write('### Przydział grupy wyświetli się poniżej :point_down:')
 
     # load data
     data = load_data()
 
+    # user input here
+    st.sidebar.title('Wypełnij swoje dane:')
+
+    user_data = {}
+    for column in data.columns:  # assuming user data has the same columns as the dataset
+        user_data[column] = st.sidebar.text_input(f'Wpisz {column}', '')
+
+    # give time to user for the input
+    time.sleep(30) # this explicit sleep should be changed to conditional one
+
+    user_df = pd.DataFrame([user_data])
+
+    # add the user to the dataset
+    df = pd.concat([data, user_df], ignore_index=True)
+
     # preprocess data
-    encoded_data = preprocess_data(data)
+    encoded_data = preprocess_data(df)
 
     # assign groups
     clustered_data = assign_groups(encoded_data)
 
     # display the group assignments
-    st.write('## Przypisane numery grup')
-    st.write(clustered_data)
+    #st.write('## Przypisane numery grup')
+    #st.write(clustered_data)
+    
+    # print the individual group assignment
+    st.write('## Zostałeś/aś przydzielony/a do grupy nr ', clustered_data[-1], ' :smiley:')
+    st.write('### Będziesz się uczyć z ', clustered_data.tolist().count(clustered_data[-1]) - 1, ' innymi uczniami!')
 
 # run the app
 if __name__ == '__main__':
