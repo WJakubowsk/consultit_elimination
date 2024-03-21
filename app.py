@@ -11,8 +11,9 @@ import time
 @st.cache_data
 def load_data():
     data = pd.read_excel("Baza_uczniów_CIT_2024.xlsx")
+    names = data["Imię"]
     data.drop(["Imię", "L.P."], axis=1, inplace=True)
-    return data
+    return data, names
 
 
 # data preprocessing function
@@ -80,7 +81,7 @@ def main():
     st.write("### Przydział grupy wyświetli się poniżej :point_down:")
 
     # load data
-    data = load_data()
+    data, names = load_data()
 
     # user input here
     st.sidebar.title("Wypełnij swoje dane:")
@@ -114,10 +115,8 @@ def main():
 
         # assign groups
         clustered_data = assign_groups(encoded_data)
-
-        # display the group assignments
-        # st.write('## Przypisane numery grup')
-        # st.write(clustered_data)
+        df["Group"] = clustered_data
+        df["Imię"] = names
 
         # print the individual group assignment
         st.write(
@@ -128,7 +127,11 @@ def main():
         st.write(
             "### Będziesz się uczyć z ",
             clustered_data.tolist().count(clustered_data[-1]) - 1,
-            " innymi uczniami!",
+            " innymi uczniami. Oto oni:",
+            df.loc[
+                (df["Group"] == clustered_data[-1]),
+                ["Imię", "Płeć", "Wiek"],
+            ][:-1],
         )
 
 
